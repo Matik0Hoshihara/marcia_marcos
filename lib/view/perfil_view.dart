@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../controller/perfil_controller.dart';
+import '../controller/usuario_controller.dart';
 
 class PerfilView extends StatefulWidget {
   const PerfilView({super.key});
@@ -10,10 +10,27 @@ class PerfilView extends StatefulWidget {
 
 class _PerfilViewState extends State<PerfilView> {
   final _formKey = GlobalKey<FormState>();
-  final _controller = PerfilController();
+  late TextEditingController _nomeTextController;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _nomeTextController = TextEditingController(
+      text: UsuarioController.instance.nome,
+    );
+  }
+
+  @override
+  void dispose() {
+    _nomeTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final usuarioLogado = UsuarioController.instance;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('MEU PERFIL'),
@@ -36,12 +53,11 @@ class _PerfilViewState extends State<PerfilView> {
 
                 //NOME DO USUÁRIO
                 TextFormField(
-                  initialValue: _controller.nome,
+                  controller: _nomeTextController,
                   decoration: const InputDecoration(
                     labelText: 'NOME DO USUÁRIO',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: _controller.setNome,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Por favor, informe o seu nome.';
@@ -56,7 +72,7 @@ class _PerfilViewState extends State<PerfilView> {
 
                 //E-MAIL
                 TextFormField(
-                  initialValue: _controller.email,
+                  initialValue: usuarioLogado.email,
                   enabled: false,
                   decoration: const InputDecoration(
                     labelText: 'E-MAIL',
@@ -66,13 +82,16 @@ class _PerfilViewState extends State<PerfilView> {
                 ),
                 const SizedBox(height: 28),
 
-                // BOTÃO SALVAR 
+                //SALVAR ALTERAÇÕES
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
+                      // Salva permanentemente o nome no UsuarioController
+                      usuarioLogado.atualizarNome(_nomeTextController.text);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Perfil atualizado com sucesso!'),

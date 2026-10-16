@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../controller/login_controller.dart';
+import '../controller/usuario_controller.dart';
 import 'cadastrar_usuario_view.dart';
 import 'recuperar_senha_view.dart';
 import '../core/app_routes.dart';
@@ -33,7 +34,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: 32),
               
-              //VALIDAÇÃO DE FORMATO DO E-MAIL
+              //E-MAIL
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'E-MAIL',
@@ -78,10 +79,13 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: 24),
 
-              // BOTÃO ENTRAR
+              //ENTRAR
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
+                    
+                    UsuarioController.instance.definirEmail(_controller.email);
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Bem-vindo!'), duration: Duration(seconds: 2)),
                     );
@@ -91,7 +95,7 @@ class _LoginViewState extends State<LoginView> {
                 child: const Text('ENTRAR'),
               ),
 
-              // BOTÃO CADASTRAR USUÁRIO
+              //CADASTRAR USUÁRIO
               TextButton(
                 onPressed: () {
                   Navigator.push(
