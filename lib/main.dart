@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:device_preview_plus/device_preview_plus.dart'; 
 
 import 'core/app_routes.dart';
 import 'view/login_view.dart';
@@ -14,7 +16,12 @@ import 'view/espanha_view.dart';
 import 'view/brasil_view.dart';
 
 void main() {
-  runApp(const MeuApp());
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => const MeuApp(),
+    ),
+  );
 }
 
 class MeuApp extends StatelessWidget {
@@ -23,6 +30,9 @@ class MeuApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
+      
       title: 'Viagens 2026',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
