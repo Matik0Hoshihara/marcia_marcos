@@ -36,7 +36,8 @@ class PrincipalView extends StatelessWidget {
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+            mainAxisSpacing: 20,
+            childAspectRatio: 2,
           ),
           itemCount: paises.length,
           itemBuilder: (context, index) {
