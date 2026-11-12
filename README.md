@@ -1,17 +1,31 @@
-# marcia_marcos
+# M&M Viagens ✈️
+ 
+Aplicativo multiplataforma para gestão de roteiros de viagens, desenvolvido como Trabalho Final da disciplina de Programação para Dispositivos Móveis do curso de Análise e Desenvolvimento de Sistemas (ADS) da Fatec.
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Tecnologias Utilizadas
+ 
+- **Framework:** [Flutter](https://flutter.dev/) (Dart)
+- **Gerenciamento de Estado / DI:** GetIt
+- **Backend (BaaS):** Firebase (Authentication, Cloud Firestore, Hosting)
+- **Design:** Material Design 3
+ 
+## ⚙️ Como Executar o Projeto
+ 
+Certifique-se de ter o Flutter SDK instalado em sua máquina.
+ 
+1. Clone este repositório:
+   ```bash
+   git clone [## 🛠️ Tecnologias Utilizadas
+ 
+- **Framework:** [Flutter](https://flutter.dev/) (Dart)
+- **Gerenciamento de Estado / DI:** GetIt
+- **Backend (BaaS):** Firebase (Authentication, Cloud Firestore, Hosting)
+- **Design:** Material Design 3
+ 
+## ⚙️ Como Executar o Projeto
+ 
+Certifique-se de ter o Flutter SDK instalado em sua máquina.
+ 
+1. Clone este repositório:
+   ```bash
+   git clone [https://github.com/Matik0Hoshihara/marcia_marcos](https://github.com/Matik0Hoshihara/marcia_marcos)]
