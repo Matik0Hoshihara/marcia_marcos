@@ -1,8 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:device_preview_plus/device_preview_plus.dart'; 
-
+import 'package:device_preview_plus/device_preview_plus.dart';
+import 'package:get_it/get_it.dart';
+ 
+// Importações do Firebase
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+ 
+// Importações locais
 import 'core/app_routes.dart';
+import 'controller/auth_controller.dart';
+import 'controller/viagem_controller.dart';
+ 
 import 'view/login_view.dart';
 import 'view/cadastrar_usuario_view.dart';
 import 'view/recuperar_senha_view.dart';
@@ -14,8 +23,27 @@ import 'view/japao_view.dart';
 import 'view/portugal_view.dart';
 import 'view/espanha_view.dart';
 import 'view/brasil_view.dart';
-
-void main() {
+import 'view/nova_viagem_view.dart';
+ 
+final getIt = GetIt.instance;
+ 
+void setupGetIt() {
+  getIt.registerLazySingleton<AuthController>(() => AuthController());
+  getIt.registerLazySingleton<ViagemController>(() => ViagemController());
+}
+ 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+ 
+  // Inicializa o Firebase com as opções geradas no firebase_options.dart
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+ 
+  // Injeta suas dependências
+  setupGetIt();
+ 
+  // Roda o aplicativo
   runApp(
     DevicePreview(
       enabled: !kReleaseMode,
@@ -23,16 +51,15 @@ void main() {
     ),
   );
 }
-
+ 
 class MeuApp extends StatelessWidget {
   const MeuApp({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
-      
       title: 'Viagens 2026',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -52,6 +79,7 @@ class MeuApp extends StatelessWidget {
         AppRoutes.portugal: (context) => const PortugalView(),
         AppRoutes.espanha: (context) => const EspanhaView(),
         AppRoutes.brasil: (context) => const BrasilView(),
+        AppRoutes.novaViagem: (context) => const NovaViagemView(),
       },
     );
   }

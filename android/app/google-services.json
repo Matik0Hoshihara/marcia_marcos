@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "989097701936",
+    "project_id": "marciamarcos",
+    "storage_bucket": "marciamarcos.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:989097701936:android:5bbb088082672d0230f3f5",
+        "android_client_info": {
+          "package_name": "com.example.marcia_marcos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkIrymN5idl8ruyvwDQb4u8S8l9DdWjNw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

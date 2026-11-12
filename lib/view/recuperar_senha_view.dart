@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart'; // IMPORTAÇÃO DO GETIT
+import '../controller/auth_controller.dart'; // IMPORTAÇÃO DO AUTH CONTROLLER
 import '../controller/recuperar_senha_controller.dart';
-
+ 
 class RecuperarSenhaView extends StatefulWidget {
   const RecuperarSenhaView({super.key});
-
+ 
   @override
   State<RecuperarSenhaView> createState() => _RecuperarSenhaViewState();
 }
-
+ 
 class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
   final _formKey = GlobalKey<FormState>();
   final _controller = RecuperarSenhaController();
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,8 +41,8 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                   style: TextStyle(fontSize: 15, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
-
-                // CAMPO PARA INFORMAÇÃO DO E-MAIL (Requisito RF003)
+ 
+                // CAMPO PARA INFORMAÇÃO DO E-MAIL
                 TextFormField(
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
@@ -50,11 +52,9 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                   ),
                   onChanged: _controller.setEmail,
                   validator: (value) {
-                    // Item 1: Verifica se o campo foi preenchido
                     if (value == null || value.trim().isEmpty) {
                       return 'Por favor, informe o seu e-mail.';
                     }
-                    // Item 2: Valida se o formato do e-mail é válido
                     if (!value.contains('@') || !value.split('@').last.contains('.')) {
                       return 'Informe um e-mail com formato válido (ex: usuario@dominio.com).';
                     }
@@ -62,30 +62,61 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                   },
                 ),
                 const SizedBox(height: 24),
-
-                //SOLICITAR A RECUPERAÇÃO
+ 
+                // SOLICITAR A RECUPERAÇÃO (Integrado ao Firebase via GetIt)
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // Item 3: Caso o e-mail seja válido, inicia o processo e envia instruções
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Instruções de redefinição enviadas para o seu e-mail!'),
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 4),
-                        ),
+                      // 1. Mostra a animação de carregamento
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => const Center(child: CircularProgressIndicator()),
                       );
-                      Navigator.pop(context);
+ 
+                      try {
+                        // 2. Chama o método recuperarSenha no Firebase
+                        final auth = GetIt.I<AuthController>();
+                        await auth.recuperarSenha(_controller.email);
+ 
+                        // 3. Fecha o carregamento
+                        if (mounted) {
+                          Navigator.pop(context);
+                        }
+ 
+                        // 4. Feedback de sucesso exigido pela rubrica
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Instruções de redefinição enviadas para o seu e-mail!'),
+                              backgroundColor: Colors.green,
+                              duration: Duration(seconds: 4),
+                            ),
+                          );
+                          Navigator.pop(context); // Volta para a tela de login
+                        }
+                      } catch (e) {
+                        // Trata erros (ex: e-mail não existe) e fecha o carregamento
+                        if (mounted) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Erro: Não foi possível enviar o e-mail. Verifique o endereço.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
                     }
                   },
                   child: const Text('SOLICITAR RECUPERAÇÃO'),
                 ),
                 const SizedBox(height: 16),
-
-                //VOLTAR P/ LOGIN
+ 
+                // VOLTAR P/ LOGIN
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('voltar ao login'),

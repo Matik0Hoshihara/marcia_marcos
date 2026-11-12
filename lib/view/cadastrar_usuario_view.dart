@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart'; // IMPORTAÇÃO DO GETIT
 import '../controller/cadastrar_usuario_controller.dart';
-
+import 'package:marcia_marcos/controller/auth_controller.dart';
+import '../core/app_routes.dart'; // PARA A NAVEGAÇÃO
+ 
 class CadastrarUsuarioView extends StatefulWidget {
   const CadastrarUsuarioView({super.key});
-
+ 
   @override
   State<CadastrarUsuarioView> createState() => _CadastrarUsuarioViewState();
 }
-
+ 
 class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
   final _formKey = GlobalKey<FormState>();
   final _controller = CadastrarUsuarioController();
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,8 +35,8 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 28),
-
-                  //NOME
+ 
+                  // NOME
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'NOME',
@@ -44,8 +47,8 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                         value == null || value.trim().isEmpty ? 'Informe o seu nome' : null,
                   ),
                   const SizedBox(height: 16),
-
-                  //E-MAIL
+ 
+                  // E-MAIL
                   TextFormField(
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
@@ -64,8 +67,8 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  //TELEFONE
+ 
+                  // TELEFONE
                   TextFormField(
                     keyboardType: TextInputType.phone,
                     decoration: const InputDecoration(
@@ -77,8 +80,8 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                         value == null || value.trim().isEmpty ? 'Informe o seu telefone' : null,
                   ),
                   const SizedBox(height: 16),
-
-                  //SENHA
+ 
+                  // SENHA
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'SENHA',
@@ -97,8 +100,8 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  //CONFIRMAR SENHA
+ 
+                  // CONFIRMAR SENHA
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'CONFIRMAR SENHA',
@@ -117,21 +120,61 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                     },
                   ),
                   const SizedBox(height: 28),
-
-                  // BOTÃO CADASTRAR
+ 
+                  // BOTÃO CADASTRAR (Alterado para async e integrado ao Firebase)
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Usuário cadastrado com sucesso!')),
+                        // 1. Mostra a animação de carregamento
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const Center(child: CircularProgressIndicator()),
                         );
-                        Navigator.pop(context);
+ 
+                        // 2. Chama o AuthController via GetIt
+                        final auth = GetIt.I<AuthController>();
+                        // Executa o registo enviando as variáveis que estão no seu _controller
+                        final erro = await auth.registrar(
+                          _controller.email,     // Garanta que o seu _controller possui estas variáveis expostas
+                          _controller.senha,
+                          _controller.nome,
+                          _controller.telefone,
+                        );
+ 
+                        // 3. Fecha o dialog de carregamento
+                        if (mounted) {
+                          Navigator.pop(context);
+                        }
+ 
+                        // 4. Feedback Visual (RF002 exige isto)
+                        if (erro == null) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Usuário cadastrado com sucesso!'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            // Redireciona para a tela de login (ou pop)
+                            Navigator.pushReplacementNamed(context, AppRoutes.login);
+                          }
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Erro: $erro'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                     child: const Text('CADASTRAR USUÁRIO'),
                   ),
                   const SizedBox(height: 12),
-
+ 
                   // BOTÃO VOLTAR P/ LOGIN
                   TextButton(
                     onPressed: () {

@@ -1,113 +1,180 @@
 import 'package:flutter/material.dart';
-import '../controller/usuario_controller.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+ 
 class PerfilView extends StatefulWidget {
   const PerfilView({super.key});
-
+ 
   @override
   State<PerfilView> createState() => _PerfilViewState();
 }
-
+ 
 class _PerfilViewState extends State<PerfilView> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nomeTextController;
-
+  final TextEditingController _nomeController = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser;
+  bool _isLoading = true;
+  String _telefone = '';
+ 
   @override
   void initState() {
     super.initState();
-    
-    _nomeTextController = TextEditingController(
-      text: UsuarioController.instance.nome,
+    _carregarDadosPerfil();
+  }
+ 
+  // Busca os dados atuais do Firestore uma única vez para preencher o formulário
+  Future<void> _carregarDadosPerfil() async {
+    if (user != null) {
+      try {
+        DocumentSnapshot doc = await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(user!.uid)
+            .get();
+ 
+        if (doc.exists) {
+          final data = doc.data() as Map<String, dynamic>;
+          setState(() {
+            _nomeController.text = data['nome'] ?? '';
+            _telefone = data['telefone'] ?? 'Não informado';
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+        _mostrarMensagem('Erro ao carregar dados do perfil.', erro: true);
+      }
+    }
+  }
+ 
+  // Valida e atualiza o novo nome no banco de dados (RF005)
+  Future<void> _salvarAlteracoes() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('usuarios')
+            .doc(user!.uid)
+            .update({
+              'nome': _nomeController.text.trim(),
+            });
+        _mostrarMensagem('Perfil atualizado com sucesso!');
+      } catch (e) {
+        _mostrarMensagem('Erro ao atualizar o perfil.', erro: true);
+      }
+    }
+  }
+ 
+  void _mostrarMensagem(String texto, {bool erro = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(texto),
+        backgroundColor: erro ? Colors.red : Colors.green,
+      ),
     );
   }
-
+ 
   @override
   void dispose() {
-    _nomeTextController.dispose();
+    _nomeController.dispose();
     super.dispose();
   }
-
+ 
   @override
   Widget build(BuildContext context) {
-    final usuarioLogado = UsuarioController.instance;
-
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Meu Perfil')),
+        body: const Center(child: Text('Usuário não autenticado.')),
+      );
+    }
+ 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MEU PERFIL'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        title: const Text('Meu Perfil'),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                const Icon(Icons.account_circle, size: 80, color: Colors.blue),
-                const SizedBox(height: 28),
-
-                //NOME DO USUÁRIO
-                TextFormField(
-                  controller: _nomeTextController,
-                  decoration: const InputDecoration(
-                    labelText: 'NOME DO USUÁRIO',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Por favor, informe o seu nome.';
-                    }
-                    if (value.trim().length < 3) {
-                      return 'O nome deve conter no mínimo 3 caracteres.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                //E-MAIL
-                TextFormField(
-                  initialValue: usuarioLogado.email,
-                  enabled: false,
-                  decoration: const InputDecoration(
-                    labelText: 'E-MAIL',
-                    border: OutlineInputBorder(),
-                    filled: true,
-                  ),
-                ),
-                const SizedBox(height: 28),
-
-                //SALVAR ALTERAÇÕES
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Salva permanentemente o nome no UsuarioController
-                      usuarioLogado.atualizarNome(_nomeTextController.text);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Perfil atualizado com sucesso!'),
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 3),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.blue,
+                      child: Icon(Icons.person, size: 50, color: Colors.white),
+                    ),
+                    const SizedBox(height: 32),
+                    // CAMPO NOME (Editável - RF005)
+                    TextFormField(
+                      controller: _nomeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nome do Usuário',
+                        prefixIcon: Icon(Icons.badge),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'O nome não pode ficar vazio.';
+                        }
+                        if (value.trim().length < 3) {
+                          return 'O nome deve ter no mínimo 3 caracteres.';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+ 
+                    // CAMPO E-MAIL (Apenas leitura - RF005)
+                    TextFormField(
+                      initialValue: user!.email ?? 'Não informado',
+                      readOnly: true, // Bloqueia a edição
+                      decoration: const InputDecoration(
+                        labelText: 'E-mail',
+                        prefixIcon: Icon(Icons.email),
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.black12, // Feedback visual de que está bloqueado
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+ 
+                    // CAMPO TELEFONE (Apenas leitura demonstrativa)
+                    TextFormField(
+                      initialValue: _telefone,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Telefone',
+                        prefixIcon: Icon(Icons.phone),
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.black12,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+ 
+                    // BOTÃO SALVAR (RF005)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: _salvarAlteracoes,
+                        icon: const Icon(Icons.save),
+                        label: const Text(
+                          'Salvar Alterações',
+                          style: TextStyle(fontSize: 16),
                         ),
-                      );
-                    }
-                  },
-                  child: const Text('SALVAR ALTERAÇÕES'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

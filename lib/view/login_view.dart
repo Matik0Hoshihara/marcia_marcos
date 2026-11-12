@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart'; // IMPORTAÇÃO DO GETIT
+import '../controller/auth_controller.dart'; // IMPORTAÇÃO DO AUTH CONTROLLER
 import '../controller/login_controller.dart';
 import '../controller/usuario_controller.dart';
 import 'cadastrar_usuario_view.dart';
 import 'recuperar_senha_view.dart';
 import '../core/app_routes.dart';
-
+ 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
-
+ 
   @override
   State<LoginView> createState() => _LoginViewState();
 }
-
+ 
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
   final _controller = LoginController();
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,17 +35,14 @@ class _LoginViewState extends State<LoginView> {
                   // LOGO
                   Column(
                     children: [
-
-
                       // AVIÃO
                       const Icon(
-                        Icons.flight_takeoff, 
-                        size: 64, 
-                        color: Colors.blue, 
+                        Icons.flight_takeoff,
+                        size: 64,
+                        color: Colors.blue,
                       ),
                       const SizedBox(height: 8),
-
-
+ 
                       // TÍTULO
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -70,15 +69,15 @@ class _LoginViewState extends State<LoginView> {
                     ],
                   ),
                   const SizedBox(height: 32),
-
+ 
                   const Text(
                     'LOGIN',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 32),
-                  
-                  //E-MAIL
+ 
+                  // E-MAIL
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'E-MAIL',
@@ -96,8 +95,8 @@ class _LoginViewState extends State<LoginView> {
                     },
                   ),
                   const SizedBox(height: 16),
-
-                  //SENHA
+ 
+                  // SENHA
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: 'SENHA',
@@ -107,9 +106,7 @@ class _LoginViewState extends State<LoginView> {
                     onChanged: _controller.setSenha,
                     validator: (value) => value == null || value.isEmpty ? 'Informe a senha' : null,
                   ),
-                
-
-
+ 
                   // RECUPERAR SENHA
                   Align(
                     alignment: Alignment.centerRight,
@@ -124,25 +121,57 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-
-                  //ENTRAR
+ 
+                  // ENTRAR (Alterado para async e integrado ao Firebase)
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        UsuarioController.instance.definirEmail(_controller.email);
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Bem-vindo!'), duration: Duration(seconds: 2)),
+                        // 1. Mostra a animação de carregamento
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const Center(child: CircularProgressIndicator()),
                         );
-                        Navigator.pushReplacementNamed(context, AppRoutes.principal);
+ 
+                        // 2. Chama o AuthController via GetIt
+                        final auth = GetIt.I<AuthController>();
+                        final erro = await auth.login(_controller.email, _controller.senha);
+ 
+                        // 3. Fecha o dialog de carregamento
+                        if (mounted) {
+                          Navigator.pop(context);
+                        }
+ 
+                        // 4. Feedback Visual e Navegação (Exigência RF001)
+                        if (erro == null) {
+                          // Opcional: Manter o seu UsuarioController local atualizado, se ainda o usar
+                          UsuarioController.instance.definirEmail(_controller.email);
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Bem-vindo!'),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pushReplacementNamed(context, AppRoutes.principal);
+                          }
+                        } else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Erro ao entrar: $erro'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
                       }
                     },
                     child: const Text('ENTRAR'),
                   ),
-
-
-                  //CADASTRAR USUÁRIO
+ 
+                  // CADASTRAR USUÁRIO
                   TextButton(
                     onPressed: () {
                       Navigator.push(
