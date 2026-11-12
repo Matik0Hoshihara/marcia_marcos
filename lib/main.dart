@@ -40,7 +40,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
  
-  // Injeta suas dependências
   setupGetIt();
  
   // Roda o aplicativo

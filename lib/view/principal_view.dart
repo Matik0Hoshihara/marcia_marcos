@@ -52,7 +52,7 @@ class PrincipalView extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            // ABA 1: DESTINOS (PAÍSES)
+            
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: GridView.builder(
@@ -97,8 +97,6 @@ class PrincipalView extends StatelessWidget {
               ),
             ),
  
-            // ABA 2: MINHAS VIAGENS (RF004)
-
             StreamBuilder<QuerySnapshot>(
 
               stream: FirebaseFirestore.instance
@@ -111,23 +109,17 @@ class PrincipalView extends StatelessWidget {
 
               builder: (context, snapshot) {
 
-                // Feedback visual de carregamento
-
                 if (snapshot.connectionState == ConnectionState.waiting) {
 
                   return const Center(child: CircularProgressIndicator());
 
                 }
 
-                // Tratamento de erro
-
                 if (snapshot.hasError) {
 
                   return const Center(child: Text('Erro ao carregar as viagens.'));
 
                 }
-
-                // Tratamento para lista vazia
 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
 

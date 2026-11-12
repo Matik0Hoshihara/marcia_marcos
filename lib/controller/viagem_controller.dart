@@ -5,7 +5,7 @@ class ViagemController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
  
-  // RF003: Inserção de dados (5 campos mínimos + segregação por usuário)
+  // Inserção de dados 
   Future<String?> adicionarViagem({
     required String destino,
     required String dataIda,
@@ -22,16 +22,16 @@ class ViagemController {
  
       // Salva os dados na coleção 'viagens'
       await _firestore.collection('viagens').add({
-        'userId': user.uid, // Garante a separação dos dados por usuário
-        'destino': destino, // Campo 1
-        'dataIda': dataIda, // Campo 2
-        'dataVolta': dataVolta, // Campo 3
-        'orcamento': orcamento, // Campo 4
-        'status': status, // Campo 5
+        'userId': user.uid, 
+        'destino': destino, 
+        'dataIda': dataIda, 
+        'dataVolta': dataVolta, 
+        'orcamento': orcamento, 
+        'status': status, 
         'criadoEm': FieldValue.serverTimestamp(),
       });
  
-      return null; // Retorna nulo quando dá sucesso
+      return null; 
     } catch (e) {
       return 'Erro ao salvar a viagem: $e';
     }

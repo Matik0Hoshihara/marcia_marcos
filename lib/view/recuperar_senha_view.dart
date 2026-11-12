@@ -42,7 +42,7 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                 ),
                 const SizedBox(height: 32),
  
-                // CAMPO PARA INFORMAÇÃO DO E-MAIL
+                // E-MAIL
                 TextFormField(
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
@@ -63,14 +63,13 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                 ),
                 const SizedBox(height: 24),
  
-                // SOLICITAR A RECUPERAÇÃO (Integrado ao Firebase via GetIt)
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // 1. Mostra a animação de carregamento
+
                       showDialog(
                         context: context,
                         barrierDismissible: false,
@@ -78,16 +77,14 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                       );
  
                       try {
-                        // 2. Chama o método recuperarSenha no Firebase
+
                         final auth = GetIt.I<AuthController>();
                         await auth.recuperarSenha(_controller.email);
  
-                        // 3. Fecha o carregamento
                         if (mounted) {
                           Navigator.pop(context);
                         }
  
-                        // 4. Feedback de sucesso exigido pela rubrica
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -99,7 +96,7 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                           Navigator.pop(context); // Volta para a tela de login
                         }
                       } catch (e) {
-                        // Trata erros (ex: e-mail não existe) e fecha o carregamento
+
                         if (mounted) {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(

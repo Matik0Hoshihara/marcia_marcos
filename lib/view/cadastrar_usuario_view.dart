@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart'; // IMPORTAÇÃO DO GETIT
+import 'package:get_it/get_it.dart';
 import '../controller/cadastrar_usuario_controller.dart';
 import 'package:marcia_marcos/controller/auth_controller.dart';
 import '../core/app_routes.dart'; // PARA A NAVEGAÇÃO
@@ -121,33 +121,33 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                   ),
                   const SizedBox(height: 28),
  
-                  // BOTÃO CADASTRAR (Alterado para async e integrado ao Firebase)
+                  // BOTÃO CADASTRAR 
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // 1. Mostra a animação de carregamento
+                        
                         showDialog(
                           context: context,
                           barrierDismissible: false,
                           builder: (context) => const Center(child: CircularProgressIndicator()),
                         );
  
-                        // 2. Chama o AuthController via GetIt
+                        // AuthController via GetIt
                         final auth = GetIt.I<AuthController>();
-                        // Executa o registo enviando as variáveis que estão no seu _controller
+                        // Executa o registo enviando as variáveis que estão no ontroller
                         final erro = await auth.registrar(
-                          _controller.email,     // Garanta que o seu _controller possui estas variáveis expostas
+                          _controller.email,     
                           _controller.senha,
                           _controller.nome,
                           _controller.telefone,
                         );
  
-                        // 3. Fecha o dialog de carregamento
+                        
                         if (mounted) {
                           Navigator.pop(context);
                         }
  
-                        // 4. Feedback Visual (RF002 exige isto)
+                        
                         if (erro == null) {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -156,7 +156,7 @@ class _CadastrarUsuarioViewState extends State<CadastrarUsuarioView> {
                                 backgroundColor: Colors.green,
                               ),
                             );
-                            // Redireciona para a tela de login (ou pop)
+                            // Redireciona para a tela de login 
                             Navigator.pushReplacementNamed(context, AppRoutes.login);
                           }
                         } else {

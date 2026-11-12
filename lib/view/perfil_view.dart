@@ -46,7 +46,7 @@ class _PerfilViewState extends State<PerfilView> {
     }
   }
  
-  // Valida e atualiza o novo nome no banco de dados (RF005)
+  // Valida e atualiza o novo nome no banco de dados 
   Future<void> _salvarAlteracoes() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -106,7 +106,7 @@ class _PerfilViewState extends State<PerfilView> {
                       child: Icon(Icons.person, size: 50, color: Colors.white),
                     ),
                     const SizedBox(height: 32),
-                    // CAMPO NOME (Editável - RF005)
+                    // CAMPO NOME 
                     TextFormField(
                       controller: _nomeController,
                       decoration: const InputDecoration(
@@ -126,7 +126,7 @@ class _PerfilViewState extends State<PerfilView> {
                     ),
                     const SizedBox(height: 16),
  
-                    // CAMPO E-MAIL (Apenas leitura - RF005)
+                    // CAMPO E-MAIL 
                     TextFormField(
                       initialValue: user!.email ?? 'Não informado',
                       readOnly: true, // Bloqueia a edição
@@ -135,12 +135,12 @@ class _PerfilViewState extends State<PerfilView> {
                         prefixIcon: Icon(Icons.email),
                         border: OutlineInputBorder(),
                         filled: true,
-                        fillColor: Colors.black12, // Feedback visual de que está bloqueado
+                        fillColor: Colors.black12, 
                       ),
                     ),
                     const SizedBox(height: 16),
  
-                    // CAMPO TELEFONE (Apenas leitura demonstrativa)
+                    // CAMPO TELEFONE 
                     TextFormField(
                       initialValue: _telefone,
                       readOnly: true,
@@ -154,7 +154,7 @@ class _PerfilViewState extends State<PerfilView> {
                     ),
                     const SizedBox(height: 32),
  
-                    // BOTÃO SALVAR (RF005)
+                    // BOTÃO SALVAR 
                     SizedBox(
                       width: double.infinity,
                       height: 50,

@@ -12,13 +12,11 @@ class NovaViagemView extends StatefulWidget {
 class _NovaViagemViewState extends State<NovaViagemView> {
   final _formKey = GlobalKey<FormState>();
  
-  // Controladores locais para capturar os textos digitados
   final _destinoController = TextEditingController();
   final _idaController = TextEditingController();
   final _voltaController = TextEditingController();
   final _orcamentoController = TextEditingController();
  
-  // Opções para o campo Status
   String _statusSelecionado = 'Planejada';
   final List<String> _statusOpcoes = ['Planejada', 'Em Andamento', 'Concluída'];
  
@@ -50,7 +48,6 @@ class _NovaViagemViewState extends State<NovaViagemView> {
                   ),
                   const SizedBox(height: 24),
  
-                  // CAMPO 1: DESTINO
                   TextFormField(
                     controller: _destinoController,
                     decoration: const InputDecoration(
@@ -61,7 +58,6 @@ class _NovaViagemViewState extends State<NovaViagemView> {
                   ),
                   const SizedBox(height: 16),
  
-                  // CAMPO 2: DATA IDA
                   TextFormField(
                     controller: _idaController,
                     decoration: const InputDecoration(
@@ -72,7 +68,6 @@ class _NovaViagemViewState extends State<NovaViagemView> {
                   ),
                   const SizedBox(height: 16),
  
-                  // CAMPO 3: DATA VOLTA
                   TextFormField(
                     controller: _voltaController,
                     decoration: const InputDecoration(
@@ -83,7 +78,6 @@ class _NovaViagemViewState extends State<NovaViagemView> {
                   ),
                   const SizedBox(height: 16),
  
-                  // CAMPO 4: ORÇAMENTO
                   TextFormField(
                     controller: _orcamentoController,
                     keyboardType: TextInputType.number,
@@ -95,7 +89,6 @@ class _NovaViagemViewState extends State<NovaViagemView> {
                   ),
                   const SizedBox(height: 16),
  
-                  // CAMPO 5: STATUS
                   DropdownButtonFormField<String>(
                     value: _statusSelecionado,
                     decoration: const InputDecoration(
@@ -111,7 +104,7 @@ class _NovaViagemViewState extends State<NovaViagemView> {
                   ),
                   const SizedBox(height: 32),
  
-                  // BOTÃO SALVAR (Com feedback de sucesso/erro para o RF003)
+                  // BOTÃO SALVAR 
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                     onPressed: _salvarViagem,
@@ -126,7 +119,7 @@ class _NovaViagemViewState extends State<NovaViagemView> {
     );
   }
  
-  // LÓGICA DE SALVAMENTO
+  // SALVAMENTO
   Future<void> _salvarViagem() async {
     if (_formKey.currentState!.validate()) {
       showDialog(
@@ -135,7 +128,7 @@ class _NovaViagemViewState extends State<NovaViagemView> {
         builder: (_) => const Center(child: CircularProgressIndicator()),
       );
  
-      // Converte o texto do orçamento para double (aceita ponto ou vírgula)
+      
       final double orcamento = double.tryParse(_orcamentoController.text.replaceAll(',', '.')) ?? 0.0;
  
       // Chama o controlador

@@ -122,29 +122,26 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 24),
  
-                  // ENTRAR (Alterado para async e integrado ao Firebase)
+                  // ENTRAR 
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // 1. Mostra a animação de carregamento
+                        
                         showDialog(
                           context: context,
                           barrierDismissible: false,
                           builder: (context) => const Center(child: CircularProgressIndicator()),
                         );
  
-                        // 2. Chama o AuthController via GetIt
                         final auth = GetIt.I<AuthController>();
                         final erro = await auth.login(_controller.email, _controller.senha);
  
-                        // 3. Fecha o dialog de carregamento
                         if (mounted) {
                           Navigator.pop(context);
                         }
- 
-                        // 4. Feedback Visual e Navegação (Exigência RF001)
+
                         if (erro == null) {
-                          // Opcional: Manter o seu UsuarioController local atualizado, se ainda o usar
+
                           UsuarioController.instance.definirEmail(_controller.email);
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
